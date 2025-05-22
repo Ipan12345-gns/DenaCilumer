@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toko Makanan - Home</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand"><a href="index.html"><img src="asets/Logo.png" alt="Logo Toko Makanan" style="height:54px;vertical-align:middle;"></a></div>
+      <form class="navbar-search" id="search-form" onsubmit="return false;">
+        <input type="text" id="search-input" placeholder="Cari makanan/minuman..." autocomplete="off">
+        <button type="submit" title="Cari"><span>🔍</span></button>
+      </form>
+      <ul class="navbar-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gallery.html">Galeri Produk</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="refreshing.html">Refreshing</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="landing" style="background-image: url('asets/Foto bersama depan toko.jpeg'); min-height: 92vh;">
+    <div class="landing-overlay"></div>
+    <div class="landing-content minimalist leftwhite centertext">
+      <h1 id="animated-welcome" class="fancy-anim playfair">Selamat Datang di Toko Kami!</h1>
+      <p>Kami menyediakan makanan lezat, sehat, dan terjangkau. Silakan lihat produk kami di halaman galeri.</p>
+      <p class="established"><b>Sejak 22 Desember 2021</b></p>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <p>Terms & Conditions</p>
+        <p>Privacy Policy</p>
+        <p>Shipping Policy</p>
+        <p>Refund Policy</p>
+      </div>
+      <div class="footer-col">
+        <p>Cookie Policy</p>
+        <p>FAQ</p>
+        <p>Payment Methods</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Address:</b></p>
+        <p>Jl. Cibaliung-Sumur</p>
+        <p>Kec. Cibaliung, Kab. Pandeglang, Banten 42286</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Contact:</b></p>
+        <p>Dena Cilumer</p>
+        <p>+62 857-1137-5919</p>
+        <p style="margin:0.5rem 0 0.2rem 0;"><b>Sosial Media:</b></p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/abieh_wahyudin?igsh=MXF6bTlkbGU2YWVkYw==" target="_blank" title="Instagram" rel="noopener"> <img src="sosial media/Instagram.png" alt="" style="width: 30px; height: 30px;"> </a>
+          <a href="https://www.tiktok.com/@denacilumer?_t=ZS-8wVrUbAkeSQ&_r=1" target="_blank" title="TikTok" rel="noopener"> <img src="sosial media/Tiktok.png" alt="" style="width: 25px; height: 32px;"> </a>
+          <a href="https://www.facebook.com/beabyma2" target="_blank" title="Facebook" rel="noopener"> <img src="sosial media/Facebook.png" alt="" style="width: 22px; height: 22px;"> </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <p><b>Created by:</b></p>
+        <p>Ipan Ramadan</p>
+        <p>Creator Muda Berkarya (CMB) Production</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 Food&Drink DENA CILUMER Cibaliung-Sumur.
+    </div>
+  </footer>
+  <div id="audio-player-container">
+    <button id="audio-play" title="Play/Pause">⏸️</button>
+    <input type="range" id="audio-volume" min="0" max="1" step="0.01" value="0.7" title="Volume">
+    <span id="audio-status">Playing</span>
+  </div>
+  <audio id="audio-backsound" src="music/Music Italia Resto.mpeg" autoplay loop></audio>
+  <script>
+    // Animasi huruf oranye random, smooth, font khusus
+    const welcome = document.getElementById('animated-welcome');
+    const text = welcome.textContent;
+    function animateWelcomeHuruf() {
+      let n = Math.max(2, Math.floor(Math.random()*3)+1); // 2-4 huruf
+      let idxs = [];
+      while (idxs.length < n) {
+        let idx = Math.floor(Math.random()*text.length);
+        if (text[idx] !== ' ' && !idxs.includes(idx)) idxs.push(idx);
+      }
+      welcome.innerHTML = text.split('').map((c,i)=>
+        idxs.includes(i)?`<span class='fancy-orange'>${c}</span>`:c
+      ).join('');
+    }
+    setInterval(animateWelcomeHuruf, 2500); // Changed to 2.5 seconds
+    animateWelcomeHuruf();
+
+    // Audio player logic
+    const audio = document.getElementById('audio-backsound');
+    const playBtn = document.getElementById('audio-play');
+    const volSlider = document.getElementById('audio-volume');
+    const status = document.getElementById('audio-status');
+    let playing = true;
+
+    // Initialize audio
+    audio.volume = volSlider.value;
+    
+    // Handle play/pause
+    playBtn.onclick = function() {
+      if (audio.paused) { 
+        audio.play(); 
+        playBtn.textContent = '⏸️'; 
+        status.textContent = 'Playing'; 
+        playing = true; 
+      } else { 
+        audio.pause(); 
+        playBtn.textContent = '▶️'; 
+        status.textContent = 'Paused'; 
+        playing = false; 
+      }
+    };
+
+    // Handle volume change
+    volSlider.oninput = function() { 
+      audio.volume = this.value; 
+    };
+
+    // Handle audio end
+    audio.onended = function() { 
+      playBtn.textContent = '▶️'; 
+      status.textContent = 'Paused'; 
+      playing = false; 
+    };
+
+    // Handle page visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && playing) {
+        audio.pause();
+        playBtn.textContent = '▶️';
+        status.textContent = 'Paused';
+      } else if (!document.hidden && playing) {
+        audio.play();
+        playBtn.textContent = '⏸️';
+        status.textContent = 'Playing';
+      }
+    });
+  </script>
+</body>
+</html>

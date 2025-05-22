@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refreshing - Toko Makanan</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .game-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: linear-gradient(135deg, #ffffff 60%, #d8d8d8 100%);
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(61,90,42,0.08);
+    }
+    .game-container h1 {
+      margin-bottom: 10px;
+      color: #3d5a2a;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 2px #ccc;
+    }
+    .scoreboard {
+      margin: 10px 0;
+      font-size: 1.1rem;
+      background: #fff;
+      display: inline-block;
+      padding: 8px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    #modeSelect {
+      margin: 10px 0;
+      font-size: 1rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid #3d5a2a;
+    }
+    #status {
+      margin: 10px 0;
+      font-weight: bold;
+      color: #3d5a2a;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .cell {
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      user-select: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cell:hover {
+      background: #e3f2fd;
+      transform: scale(1.05);
+    }
+    #resetBtn, #nextLevelBtn, #toFirstLevelBtn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #3d5a2a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background 0.2s;
+      margin-left: 5px;
+    }
+    #resetBtn:hover, #nextLevelBtn:hover, #toFirstLevelBtn:hover {
+      background: #7bb661;
+    }
+    .winner {
+      background: #c8e6c9 !important;
+      color: #388e3c;
+      font-weight: bold;
+      animation: winnerFlash 0.7s alternate 3;
+    }
+    @keyframes winnerFlash {
+      from { background: #c8e6c9; }
+      to { background: #fff176; }
+    }
+    .input-nama {
+      margin: 10px 0;
+    }
+    .input-nama input {
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: 1px solid #3d5a2a;
+      margin: 0 5px;
+    }
+    #levelInfo {
+      font-weight: bold;
+      color: #7bb661;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #congrats {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #388e3c;
+      margin-top: 15px;
+      display: none;
+    }
+    #tryagain {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #d32f2f;
+      margin-top: 15px;
+      display: none;
+    }
+    .cell.winner-x {
+      background: #c8e6c9 !important;
+      color: #388e3c;
+      font-weight: bold;
+      animation: winnerFlashX 0.7s alternate 3;
+    }
+    .cell.winner-o {
+      background: #ffd6d6 !important;
+      color: #d32f2f;
+      font-weight: bold;
+      animation: winnerFlashO 0.7s alternate 3;
+    }
+    @keyframes winnerFlashX {
+      from { background: #c8e6c9; }
+      to { background: #fff176; }
+    }
+    @keyframes winnerFlashO {
+      from { background: #ffd6d6; }
+      to { background: #ffe066; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand"><a href="index.html"><img src="asets/Logo.png" alt="Logo Toko Makanan" style="height:54px;vertical-align:middle;"></a></div>
+      <form class="navbar-search" id="search-form" onsubmit="return false;">
+        <input type="text" id="search-input" placeholder="Cari makanan/minuman..." autocomplete="off">
+        <button type="submit" title="Cari"><span>🔍</span></button>
+      </form>
+      <ul class="navbar-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gallery.html">Galeri Produk</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="refreshing.html">Refreshing</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="refreshing">
+    <div class="game-container">
+      <h1>Game X O</h1>
+      <div>
+        <label for="modeSelect">Mode: </label>
+        <select id="modeSelect">
+          <option value="2p">2 Pemain</option>
+          <option value="ai">Lawan AI</option>
+        </select>
+      </div>
+      <div class="input-nama">
+        <input type="text" id="playerXName" placeholder="Nama Player X" value="Player X" />
+        <input type="text" id="playerOName" placeholder="Nama Player O / AI" value="Player O" />
+        <button onclick="setNames()">Set Nama</button>
+      </div>
+      <span id="levelInfo">Level: 1 / 8</span>
+      <div class="scoreboard">
+        <span id="scoreXLabel">Player X</span>: <span id="scoreX">0</span> | 
+        <span id="scoreOLabel">Player O</span>: <span id="scoreO">0</span>
+      </div>
+      <div id="status">Player X's turn</div>
+      <div class="board" id="board"></div>
+      <button id="resetBtn">Reset Game</button>
+      <button id="nextLevelBtn">Next Level</button>
+      <button id="toFirstLevelBtn">Kembali ke Level 1</button>
+      <div id="congrats">Selamat! Kamu menang lebih banyak 🎉</div>
+      <div id="tryagain">Coba lagi, kamu bisa lebih baik!</div>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <p>Terms & Conditions</p>
+        <p>Privacy Policy</p>
+        <p>Shipping Policy</p>
+        <p>Refund Policy</p>
+      </div>
+      <div class="footer-col">
+        <p>Cookie Policy</p>
+        <p>FAQ</p>
+        <p>Payment Methods</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Address:</b></p>
+        <p>Jl. Cibaliung-Sumur</p>
+        <p>Kec. Cibaliung, Kab. Pandeglang, Banten 42286</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Contact:</b></p>
+        <p>Dena Cilumer</p>
+        <p>+62 857-1137-5919</p>
+        <p style="margin:0.5rem 0 0.2rem 0;"><b>Sosial Media:</b></p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/abieh_wahyudin?igsh=MXF6bTlkbGU2YWVkYw==" target="_blank" title="Instagram" rel="noopener"> <img src="sosial media/Instagram.png" alt="" style="width: 30px; height: 30px;"> </a>
+          <a href="https://www.tiktok.com/@denacilumer?_t=ZS-8wVrUbAkeSQ&_r=1" target="_blank" title="TikTok" rel="noopener"> <img src="sosial media/Tiktok.png" alt="" style="width: 25px; height: 32px;"> </a>
+          <a href="https://www.facebook.com/beabyma2" target="_blank" title="Facebook" rel="noopener"> <img src="sosial media/Facebook.png" alt="" style="width: 22px; height: 22px;"> </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <p><b>Created by:</b></p>
+        <p>Ipan Ramadan</p>
+        <p>Creator Muda Berkarya (CMB) Production</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 Food&Drink DENA CILUMER Cibaliung-Sumur.
+    </div>
+  </footer>
+  <div id="audio-player-container">
+    <button id="audio-play" title="Play/Pause">⏸️</button>
+    <input type="range" id="audio-volume" min="0" max="1" step="0.01" value="0.7" title="Volume">
+    <span id="audio-status">Playing</span>
+  </div>
+  <audio id="audio-backsound" src="music/Precious Swirl.mpeg" autoplay loop></audio>
+  <script>
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+    const resetBtn = document.getElementById("resetBtn");
+    const nextLevelBtn = document.getElementById("nextLevelBtn");
+    const modeSelect = document.getElementById("modeSelect");
+    const scoreXEl = document.getElementById("scoreX");
+    const scoreOEl = document.getElementById("scoreO");
+    const scoreXLabel = document.getElementById("scoreXLabel");
+    const scoreOLabel = document.getElementById("scoreOLabel");
+    const playerXNameInput = document.getElementById("playerXName");
+    const playerONameInput = document.getElementById("playerOName");
+    const levelInfo = document.getElementById("levelInfo");
+    const congrats = document.getElementById("congrats");
+    const tryagain = document.getElementById("tryagain");
+    const toFirstLevelBtn = document.getElementById("toFirstLevelBtn");
+
+    let currentPlayer = "X";
+    let gameBoard = Array(9).fill("");
+    let gameActive = true;
+    let mode = "2p";
+    let scoreX = 0;
+    let scoreO = 0;
+    let level = 1;
+    let maxLevel = 8;
+    let playerXName = "Player X";
+    let playerOName = "Player O";
+
+    const winConditions = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
+
+    function setNames() {
+      playerXName = playerXNameInput.value || "Player X";
+      playerOName = (mode === "ai") ? "AI" : (playerONameInput.value || "Player O");
+      scoreXLabel.textContent = playerXName;
+      scoreOLabel.textContent = playerOName;
+      updateStatus();
+    }
+
+    modeSelect.addEventListener("change", () => {
+      mode = modeSelect.value;
+      setNames();
+      if (mode === "ai") {
+        playerONameInput.value = "AI";
+        playerONameInput.disabled = true;
+      } else {
+        playerONameInput.value = "Player O";
+        playerONameInput.disabled = false;
+      }
+      resetGame(true);
+    });
+
+    function renderBoard() {
+      board.innerHTML = "";
+      gameBoard.forEach((val, i) => {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        cell.dataset.index = i;
+        cell.textContent = val;
+        cell.addEventListener("click", handleClick);
+        board.appendChild(cell);
+      });
+    }
+
+    function handleClick(e) {
+      const index = e.target.dataset.index;
+      if (gameBoard[index] || !gameActive) return;
+      gameBoard[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+      checkWinnerAndUpdate();
+      if (gameActive) {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        updateStatus();
+        if (mode === "ai" && currentPlayer === "O") {
+          setTimeout(aiMove, 500);
+        }
+      }
+    }
+
+    function aiMove() {
+      let empty = gameBoard.map((val, i) => val === "" ? i : null).filter(v => v !== null);
+      let move;
+      if (level >= 6) {
+        move = minimaxMove();
+      } else if (level >= 4) {
+        move = findBestMove("O") || findBestMove("X") || empty[Math.floor(Math.random() * empty.length)];
+      } else {
+        move = empty[Math.floor(Math.random() * empty.length)];
+      }
+      if (move === undefined) return;
+      gameBoard[move] = "O";
+      renderBoard();
+      checkWinnerAndUpdate();
+      if (gameActive) {
+        currentPlayer = "X";
+        updateStatus();
+      }
+    }
+
+    function findBestMove(player) {
+      for (let condition of winConditions) {
+        let [a, b, c] = condition;
+        if (gameBoard[a] === player && gameBoard[b] === player && gameBoard[c] === "") return c;
+        if (gameBoard[a] === player && gameBoard[c] === player && gameBoard[b] === "") return b;
+        if (gameBoard[b] === player && gameBoard[c] === player && gameBoard[a] === "") return a;
+      }
+      return null;
+    }
+
+    function minimaxMove() {
+      let bestScore = -Infinity;
+      let bestMove;
+      for (let i = 0; i < 9; i++) {
+        if (gameBoard[i] === "") {
+          gameBoard[i] = "O";
+          let score = minimax(gameBoard, 0, false);
+          gameBoard[i] = "";
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+      return bestMove;
+    }
+
+    function minimax(board, depth, isMaximizing) {
+      let result = getWinner(board);
+      if (result !== null) {
+        return result === "O" ? 10 - depth : depth - 10;
+      }
+      if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === "") {
+            board[i] = "O";
+            let score = minimax(board, depth + 1, false);
+            board[i] = "";
+            bestScore = Math.max(score, bestScore);
+          }
+        }
+        return bestScore;
+      } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (board[i] === "") {
+            board[i] = "X";
+            let score = minimax(board, depth + 1, true);
+            board[i] = "";
+            bestScore = Math.min(score, bestScore);
+          }
+        }
+        return bestScore;
+      }
+    }
+
+    function getWinner(board) {
+      for (let i = 0; i < winConditions.length; i++) {
+        const [a, b, c] = winConditions[i];
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+          return board[a];
+        }
+      }
+      if (!board.includes("")) return "draw";
+      return null;
+    }
+
+    function checkWinnerAndUpdate() {
+      let roundWon = false;
+      let winnerIndices = [];
+      for (let i = 0; i < winConditions.length; i++) {
+        const [a, b, c] = winConditions[i];
+        if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
+          roundWon = true;
+          winnerIndices = [a, b, c];
+          break;
+        }
+      }
+      if (roundWon) {
+        gameActive = false;
+        if (currentPlayer === "X") {
+          scoreX++;
+          scoreXEl.textContent = scoreX;
+        } else {
+          scoreO++;
+          scoreOEl.textContent = scoreO;
+        }
+        statusText.textContent = `${currentPlayer === "X" ? playerXName : playerOName} wins!`;
+        highlightWinner(winnerIndices, currentPlayer);
+        return currentPlayer;
+      }
+      if (!gameBoard.includes("")) {
+        gameActive = false;
+        statusText.textContent = "Draw!";
+        return "draw";
+      }
+      return null;
+    }
+
+    function highlightWinner(indices, winner) {
+      const cells = document.querySelectorAll('.cell');
+      indices.forEach(i => {
+        if (winner === "X") {
+          cells[i].classList.add('winner-x');
+        } else {
+          cells[i].classList.add('winner-o');
+        }
+      });
+    }
+
+    function updateStatus() {
+      statusText.textContent = `${currentPlayer === "X" ? playerXName : playerOName}'s turn`;
+    }
+
+    function resetGame(keepScore = false) {
+      currentPlayer = "X";
+      gameBoard = Array(9).fill("");
+      gameActive = true;
+      if (!keepScore) {
+        scoreX = 0;
+        scoreO = 0;
+        scoreXEl.textContent = "0";
+        scoreOEl.textContent = "0";
+      }
+      renderBoard();
+      updateStatus();
+      congrats.style.display = "none";
+      tryagain.style.display = "none";
+    }
+
+    resetBtn.addEventListener("click", () => resetGame());
+    toFirstLevelBtn.addEventListener("click", () => {
+      level = 1;
+      levelInfo.textContent = `Level: ${level} / ${maxLevel}`;
+      resetGame(true);
+    });
+
+    nextLevelBtn.addEventListener("click", () => {
+      if (level < maxLevel) {
+        level++;
+        levelInfo.textContent = `Level: ${level} / ${maxLevel}`;
+        resetGame(true);
+      } else {
+        if (scoreX > scoreO) {
+          congrats.style.display = "block";
+          tryagain.style.display = "none";
+        } else {
+          congrats.style.display = "none";
+          tryagain.style.display = "block";
+        }
+      }
+    });
+
+    renderBoard();
+    setNames();
+
+    // Audio player logic
+    const audio = document.getElementById('audio-backsound');
+    const playBtn = document.getElementById('audio-play');
+    const volSlider = document.getElementById('audio-volume');
+    const status = document.getElementById('audio-status');
+    let playing = true;
+
+    // Initialize audio
+    audio.volume = volSlider.value;
+    
+    // Handle play/pause
+    playBtn.onclick = function() {
+      if (audio.paused) { 
+        audio.play(); 
+        playBtn.textContent = '⏸️'; 
+        status.textContent = 'Playing'; 
+        playing = true; 
+      } else { 
+        audio.pause(); 
+        playBtn.textContent = '▶️'; 
+        status.textContent = 'Paused'; 
+        playing = false; 
+      }
+    };
+
+    // Handle volume change
+    volSlider.oninput = function() { 
+      audio.volume = this.value; 
+    };
+
+    // Handle audio end
+    audio.onended = function() { 
+      playBtn.textContent = '▶️'; 
+      status.textContent = 'Paused'; 
+      playing = false; 
+    };
+
+    // Handle page visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && playing) {
+        audio.pause();
+        playBtn.textContent = '▶️';
+        status.textContent = 'Paused';
+      } else if (!document.hidden && playing) {
+        audio.play();
+        playBtn.textContent = '⏸️';
+        status.textContent = 'Playing';
+      }
+    });
+  </script>
+</body>
+</html> 

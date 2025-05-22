@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location - Toko Makanan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand"><a href="index.html"><img src="asets/Logo.png" alt="Logo Toko Makanan" style="height:54px;vertical-align:middle;"></a></div>
+      <form class="navbar-search" id="search-form" onsubmit="return false;">
+        <input type="text" id="search-input" placeholder="Cari makanan/minuman..." autocomplete="off">
+        <button type="submit" title="Cari"><span>🔍</span></button>
+      </form>
+      <ul class="navbar-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gallery.html">Galeri Produk</a></li>
+        <li><a href="location.html">Location</a></li>
+        <li><a href="refreshing.html">Refreshing</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="location">
+    <div class="location-header-flex">
+      <h2>Lokasi Toko</h2>
+      <div style="display:flex;align-items:center;gap:0.7rem;">
+        <div id="clock-wib" class="clock-wib"></div>
+        <span id="open-status"></span>
+      </div>
+    </div>
+    <p><b>Alamat:</b> Jl. Cibaliung-Sumur</p>
+    <p>Kec. Cibaliung, Kab. Pandeglang, Banten 42286</p>
+    <p><a href="https://maps.app.goo.gl/6CYLVGa3PM8iyzKdA?g_st=ac" target="_blank" rel="noopener" class="maps-link">Lihat di Google Maps</a></p>
+    <div class="map-container">
+      <iframe src="https://www.google.com/maps/embed?pb=!4v1747651465711!6m8!1m7!1sms7agdVlqXaHflHSDYiNeQ!2m2!1d-6.709973986342424!2d105.6959399521566!3f342.1379405110577!4f-15.663360016734117!5f0.7820865974627469" width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <div class="store-photo" style="max-width:900px;margin:0 auto;">
+      <img src="asets/Foto bersama depan toko.jpeg" alt="Foto Gerobak/Toko" style="width:100%;max-width:100%;height:auto;">
+    </div>
+    <div class="location-info">
+      <p><b>Cabang:</b></p>
+      <ul>
+        <li>Sadang</li>
+        <li>Alun-alun Sukajadi</li>
+        <li>Sumur</li>
+      </ul>
+      <p><b>Buka setiap hari</b> pukul 10.00 - 22.00</p>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <p>Terms & Conditions</p>
+        <p>Privacy Policy</p>
+        <p>Shipping Policy</p>
+        <p>Refund Policy</p>
+      </div>
+      <div class="footer-col">
+        <p>Cookie Policy</p>
+        <p>FAQ</p>
+        <p>Payment Methods</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Address:</b></p>
+        <p>Jl. Cibaliung-Sumur</p>
+        <p>Kec. Cibaliung, Kab. Pandeglang, Banten 42286</p>
+      </div>
+      <div class="footer-col">
+        <p><b>Contact:</b></p>
+        <p>Dena Cilumer</p>
+        <p>+62 857-1137-5919</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/abieh_wahyudin?igsh=MXF6bTlkbGU2YWVkYw==" target="_blank" title="Instagram" rel="noopener"> <img src="sosial media/Instagram.png" alt="" style="width: 30px; height: 30px;"> </a>
+          <a href="https://www.tiktok.com/@denacilumer?_t=ZS-8wVrUbAkeSQ&_r=1" target="_blank" title="TikTok" rel="noopener"> <img src="sosial media/Tiktok.png" alt="" style="width: 25px; height: 32px;"> </a>
+          <a href="https://www.facebook.com/beabyma2" target="_blank" title="Facebook" rel="noopener"> <img src="sosial media/Facebook.png" alt="" style="width: 22px; height: 22px;"> </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <p><b>Created by:</b></p>
+        <p>Ipan Ramadan</p>
+        <p>Creator Muda Berkarya (CMB) Production</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 Food&Drink DENA CILUMER Cibaliung-Sumur.
+    </div>
+  </footer>
+  <div id="audio-player-container">
+    <button id="audio-play" title="Play/Pause">⏸️</button>
+    <input type="range" id="audio-volume" min="0" max="1" step="0.01" value="0.7" title="Volume">
+    <span id="audio-status">Playing</span>
+  </div>
+  <audio id="audio-backsound" src="music/Music Italia Resto.mpeg" autoplay loop></audio>
+  <script>
+    function updateClockWIB() {
+      const now = new Date();
+      // WIB = UTC+7
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const wib = new Date(utc + (3600000*7));
+      const jam = wib.getHours().toString().padStart(2,'0');
+      const menit = wib.getMinutes().toString().padStart(2,'0');
+      const detik = wib.getSeconds().toString().padStart(2,'0');
+      document.getElementById('clock-wib').textContent = jam+':'+menit+':'+detik+' WIB';
+      // Status buka/tutup
+      const openStatus = document.getElementById('open-status');
+      if (jam >= 10 && jam < 22) {
+        openStatus.innerHTML = '<span style="color:green;font-weight:bold;">● Buka</span>';
+      } else {
+        openStatus.innerHTML = '<span style="color:red;font-weight:bold;">● Tutup</span>';
+      }
+    }
+    setInterval(updateClockWIB, 1000);
+    updateClockWIB();
+
+    // Audio player logic
+    const audio = document.getElementById('audio-backsound');
+    const playBtn = document.getElementById('audio-play');
+    const volSlider = document.getElementById('audio-volume');
+    const status = document.getElementById('audio-status');
+    let playing = true;
+
+    // Initialize audio
+    audio.volume = volSlider.value;
+    
+    // Handle play/pause
+    playBtn.onclick = function() {
+      if (audio.paused) { 
+        audio.play(); 
+        playBtn.textContent = '⏸️'; 
+        status.textContent = 'Playing'; 
+        playing = true; 
+      } else { 
+        audio.pause(); 
+        playBtn.textContent = '▶️'; 
+        status.textContent = 'Paused'; 
+        playing = false; 
+      }
+    };
+
+    // Handle volume change
+    volSlider.oninput = function() { 
+      audio.volume = this.value; 
+    };
+
+    // Handle audio end
+    audio.onended = function() { 
+      playBtn.textContent = '▶️'; 
+      status.textContent = 'Paused'; 
+      playing = false; 
+    };
+
+    // Handle page visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && playing) {
+        audio.pause();
+        playBtn.textContent = '▶️';
+        status.textContent = 'Paused';
+      } else if (!document.hidden && playing) {
+        audio.play();
+        playBtn.textContent = '⏸️';
+        status.textContent = 'Playing';
+      }
+    });
+  </script>
+</body>
+</html> 
